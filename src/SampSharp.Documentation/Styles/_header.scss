@@ -1,0 +1,136 @@
+@import 'vars';
+
+header {
+  width: 100%;
+  color: $navbar-text-color;
+  border-bottom: 1px solid $navbar-border-color;
+  background-color: $navbar-background-color;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: initial;
+  .container {
+    box-sizing: initial;
+    display: flex;
+    align-items: center;
+
+    padding: 0 20px;
+    height: 100%;
+    width: 100%;
+    max-width: $max-container-width;
+    a.brand {
+      text-decoration: none;
+      img {
+        vertical-align: middle;
+      }
+    }
+  }
+
+  .space {
+    flex: 1;
+  }
+  .dropdown {
+    position: relative;
+    margin: auto;
+
+    > a {
+      color: white;
+      background-color: $sampsharp-color;
+      border-radius: 4px;
+      border: 1px solid darken($sampsharp-color, 10%);
+      padding: 7px 13px;
+      font-weight: bold;
+      font-size: 17px;
+      text-decoration: none;
+    }
+
+    ul, li, ul a {
+      margin: 0;
+      padding: 0;
+      border: none;
+      outline: none;
+      list-style: none;
+    }
+
+    ul {
+      right: 0;
+      display: none;
+      position: absolute;
+      margin-top: 25px;
+      min-width: 95px;
+      box-shadow: 2px 2px 8px 1px rgba(0, 0, 0, 0.25);
+      z-index: 1;
+
+      background-color: white;
+      border-radius: 4px;
+      border: 1px solid lighten($sampsharp-color, 50%);
+    }
+
+    ul a {
+      display: block;
+      padding: 7px 5px;
+      text-decoration: none;
+      @media (max-width: $mobile-max-width) {
+        padding: 4px 3px;
+      }
+    }
+    &.open ul {
+      display: block;
+    }
+
+  }
+
+  @media (min-width: $desktop-min-width) {
+    height: 110px;
+
+    a.brand {
+      font-weight: 600;
+      img {
+        width: 80px;
+        height: 80px;
+        vertical-align: middle;
+      }
+      strong {
+        font-size: 28px;
+      }
+    }
+
+    ul.menu {
+      list-style-type: none;
+      display: inline;
+      margin: 0;
+      padding: 0 0 0 20px;
+      li {
+        display: inline;
+        padding: 0 11px;
+        a {
+          font-size: $navbar-link-font-size;
+          text-decoration: none;
+          color: $navbar-link-color;
+          font-weight: 800;
+          &:hover {
+            color: $navbar-link-hover-color;
+          }
+        }
+      }
+    }
+  }
+
+  @media (max-width: $mobile-max-width) {
+    height: 65px;
+    ul {
+      display: none;
+    }
+    a.brand {
+      font-weight: 400;
+      img {
+        width: 55px;
+        height: 55px;
+        vertical-align: middle;
+      }
+      strong {
+        font-size: 17px;
+      }
+    }
+  }
+}

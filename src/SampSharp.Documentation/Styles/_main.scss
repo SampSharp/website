@@ -1,0 +1,75 @@
+@import 'vars';
+
+main {
+  padding-top: 20px;
+  padding-bottom: 40px;
+  overflow: hidden;
+
+  pre {
+    width:100%;
+  }
+
+  ul:first-of-type {
+    padding-left: 15px;
+    margin: 10px 0 35px 0;
+    list-style: none;
+    li {
+      a {
+        text-decoration: none;
+        font-weight: 800;
+        font-size: $index-font-size;
+        line-height: $index-line-height;
+
+        @media (max-width: $mobile-max-width) {
+          font-size: $index-font-size-mobile;
+          line-height: $index-line-height-mobile;
+        }
+
+        &:before {
+          content: '\00B6';
+          margin-right: 10px;
+          font-weight: 600;
+          color: $paragraph-text-color;
+          opacity: .2;
+        }
+      }
+    }
+  }
+
+  small.edit {
+    a {
+      color: $secondary-link-color;
+      font-size: $primary-font-size;
+      text-decoration: none;
+      &:hover {
+        color: $secondary-link-color-hover;
+        text-decoration: underline;
+      }
+    }
+
+    @media (max-width: $mobile-max-width) {
+      display: none;
+    }
+  }
+
+  a.title {
+    text-decoration: none;
+    h1, h2, h3, h4, h5, h6 {
+      font-weight: 300;
+      color: $primary-text-color;
+    }
+
+    h2:before {
+      content: '\00B6';
+      margin-right: 10px;
+      font-weight: 600;
+      color: $paragraph-text-color;
+      opacity: .2;
+    }
+  }
+}
+
+img.server-error {
+    max-width: 400px;
+    height: auto;
+}

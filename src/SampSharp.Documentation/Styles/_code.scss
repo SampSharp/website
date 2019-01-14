@@ -1,0 +1,22 @@
+@import 'vars';
+
+code {
+  background: $code-background-color;
+  padding: 2px 4px;
+  border-radius: 5px;
+  font-family: $code-font-family;
+}
+
+pre {
+  background: $code-background-color;
+  padding: 5px 5px 15px 25px;
+  border-radius: 7px;
+
+  code, code.hljs {
+    background: $code-background-color;
+    padding: 2px 50px 2px 2px;
+    overflow-x: initial;
+  }
+
+  overflow-x: auto;
+}

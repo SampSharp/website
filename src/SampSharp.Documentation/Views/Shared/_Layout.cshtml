@@ -1,0 +1,117 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="/favicon.ico">
+    <title>@Html.Raw(string.IsNullOrWhiteSpace(ViewData["Title"] as string) ? "SampSharp" : $"{ViewData["Title"]} - SampSharp")</title>
+    <link rel="stylesheet" href="/css/site.css"/>
+</head>
+<body>
+<header>
+    <div class="container">
+        <a class="brand logo" href="/">
+            <img alt="SampSharp" src="/images/sampsharp.png">
+        </a>
+        <a class="brand" href="/">
+            <strong>
+                SampSharp
+            </strong>
+        </a>
+
+        <ul class="menu">
+            <li>
+                <a href="/introduction" title="Documentation">Documentation</a>
+            </li>
+            <li>
+                <a href="http://api.sampsharp.timpotze.nl" title="API">API</a>
+            </li>
+            <li>
+                <a href="https://github.com/ikkentim/sampsharp" title="GitHub">GitHub</a>
+            </li>
+            <li>
+                <a href="https://github.com/ikkentim/SampSharp/releases" title="Download">Download</a>
+            </li>
+        </ul>
+
+        <div class="space"></div>
+        @if (Model is IHasVersionPicker && Model.VersionPicker != null)
+        {
+            @await Html.PartialAsync("_VersionsButton", (VersionPickerViewModel) Model.VersionPicker)
+        }
+    </div>
+</header>
+<div class="body">
+    <main>
+        @RenderBody()
+    </main>
+    <nav>
+        <div class="general">
+            <a name="general"></a>
+            <a href="#general" class="title">
+                <h2>General</h2>
+            </a>
+            <p>
+                <a href="http://api.sampsharp.timpotze.nl">API</a>
+                <br/>
+                <a href="https://github.com/ikkentim/sampsharp">GitHub</a>
+                <br/>
+                <a href="https://github.com/ikkentim/sampsharp/releases">Download</a>
+            </p>
+        </div>
+
+        @if (Model is IHasSidebar && Model.Sidebar != null)
+        {
+            @await Html.PartialAsync("_Sidebar", (SidebarViewModel) Model.Sidebar)
+        }
+    </nav>
+</div>
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="column">
+                <h2>Links</h2>
+                <ul>
+                    <li>
+                        <a href="/getting-started" title="Documentation">Documentation</a>
+                    </li>
+                    <li>
+                        <a href="http://api.sampsharp.timpotze.nl" title="API">API</a>
+                    </li>
+                    <li>
+                        <a href="https://github.com/ikkentim/sampsharp" title="GitHub">GitHub</a>
+                    </li>
+                    <li>
+                        <a href="https://github.com/ikkentim/sampsharp/releases" title="Download">Download</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="column">
+                <h2>Contact</h2>
+                <ul>
+                    <li>
+                        <a href="http://forum.sa-mp.com/showthread.php?t=511686" title="Forums">Forums</a>
+                    </li>
+                    <li>
+                        <a href="http://sampsharp.herokuapp.com" title="Slack Chat">Slack Chat</a>
+                    </li>
+                    <li>
+                        <a href="https://github.com/ikkentim/sampsharp/issues/"
+                           title="GitHub Issues">
+                            Report a Bug
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="row">
+            <span class="copyright">
+                SampSharp - Copyright &copy; 2015 - @DateTime.UtcNow.Year Tim Potze
+            </span>
+        </div>
+    </div>
+</footer>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.13.1/highlight.min.js"></script>
+<script src="/script.js"></script>
+</body>
+</html>

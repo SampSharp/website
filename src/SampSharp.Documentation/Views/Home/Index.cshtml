@@ -1,0 +1,113 @@
+﻿@model HomeViewModel
+
+<main class="welcome">
+    <div class="centered quick-to-docs">
+        <a href="{!{ url('/getting-started') }}">Go to the Documentation</a>
+    </div>
+    <div class="centered">
+        <h1>.NET <span class="fa fa-heart"></span> SA-MP</h1>
+        <span>
+            Raise your SA-MP game modes to a whole new level with the power of .NET
+        </span>
+
+        <pre><code class="hljs">class GameMode : BaseMode
+{
+    protected override void OnPlayerConnected(BasePlayer player, EventArgs e)
+    {
+        base.OnPlayerConnected(player, e);
+
+        player.SendClientMessage($"Welcome {player.Name}, to a SampSharp powered server!");
+    }
+}</code></pre>
+    </div>
+    <div class="divider">
+        <div class="line"></div>
+        <div class="title">Features</div>
+        <div class="line"></div>
+    </div>
+    <div class="centered features">
+        <div class="feature">
+            <div class="box">
+                <div class="title">
+                    <span class="fa fa-4x fa-language"></span>
+                    <strong>Modern Language</strong>
+                </div>
+                <div class="content">
+                    <p>
+                        SampSharp allow you to write you game mode in C#: an Object-Oriented language.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="feature">
+            <div class="box">
+                <div class="title">
+                    <span class="fa fa-4x fa-clock-o"></span>
+                    <strong>High Performance</strong>
+                </div>
+                <div class="content">
+                    <p>
+                        Make good use of the high performance .NET Core has to offer.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="feature">
+            <div class="box">
+                <div class="title">
+                    <span class="fa fa-cubes"></span>
+                    <strong>Thousands of Packages</strong>
+                </div>
+                <div class="content">
+                    <p>
+                        Unleash the power of thousands of available NuGet Packages.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="feature">
+            <div class="box">
+                <div class="title">
+                    <span class="fa fa-linux"></span>
+                    <strong>Any platform</strong>
+                </div>
+                <div class="content">
+                    <p>
+                        SampSharp can run on both Windows and Linux.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="feature">
+            <div class="box">
+                <div class="title">
+                    <span class="fa fa-ship"></span>
+                    <strong>Containerized</strong>
+                </div>
+                <div class="content">
+                    <p>
+                        SampSharp can easily run in a Docker container. [WIP]
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="feature">
+            <div class="box">
+                <div class="title">
+                    <span class="fa fa-code-fork"></span>
+                    <strong>Thread-Safe</strong>
+                </div>
+                <div class="content">
+                    <p>
+                        SampSharp is 100% thread-safe!
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>

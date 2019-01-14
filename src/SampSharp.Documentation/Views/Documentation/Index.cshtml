@@ -1,0 +1,21 @@
+﻿@model DocumentationViewModel
+
+@{
+    ViewData["Title"] = Model.Title;
+}
+
+<h1>
+    @Model.Title
+
+    <small class="edit">
+        <a href="@Model.EditUrl">
+            <i class="fa fa-github"></i> Edit this page on GitHub
+        </a>
+    </small>
+</h1>
+
+<p>
+    Last Modified: <span>@Model.LastModification.Date.ToString("yyyy-MM-dd")</span>
+</p>
+
+@Html.Raw(Model.Content);
