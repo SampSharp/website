@@ -19,6 +19,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Threading.Tasks;
+using Markdig;
 using PlayNow.StarTar;
 using PlayNow.StarTar.Headers;
 using SampSharp.Documentation.Markdown.Renderers;
@@ -194,7 +195,10 @@ namespace SampSharp.Documentation
 								var meta = ParseMeta(ref markdown);
 
 								// Parse markdown
-								var document = Markdig.Markdown.Parse(markdown);
+								var document = Markdig.Markdown.Parse(markdown, 
+                                    new MarkdownPipelineBuilder()
+                                    .UsePipeTables()
+                                    .Build());
 
 								var sw = new StringWriter();
 								var renderer = new CustomHtmlRenderer(sw);
