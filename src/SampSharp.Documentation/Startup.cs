@@ -1,4 +1,4 @@
-﻿// SampSharp.Documentation
+// SampSharp.Documentation
 // Copyright 2019 Tim Potze
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -48,8 +48,10 @@ namespace SampSharp.Documentation
 		}
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-		public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+		public void Configure(IApplicationBuilder app, IHostingEnvironment env, IDataImportService dataImportService)
 		{
+			dataImportService.ImportAllBranches();
+			
 			if (env.IsDevelopment())
 				app.UseDeveloperExceptionPage();
 			else
