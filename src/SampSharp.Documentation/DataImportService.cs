@@ -197,7 +197,7 @@ namespace SampSharp.Documentation
 								// Parse markdown
 								var document = Markdig.Markdown.Parse(markdown, 
                                     new MarkdownPipelineBuilder()
-                                    ..UseAdvancedExtensions()
+                                    .UseAdvancedExtensions()
                                     .Build());
 
 								var sw = new StringWriter();
