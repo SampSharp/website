@@ -13,17 +13,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.IO;
 using SampSharp.Documentation.Models;
 
 namespace SampSharp.Documentation.Repositories
 {
 	public interface IDataRepository
 	{
+		bool IsEmpty { get; }
+
 		void DeleteBranch(string branch);
 		bool DocExists(string branch, string path);
 		DocConfiguration GetDocConfiguration();
 		void StoreDocConfiguration(DocConfiguration config);
 		DocFile GetDocFile(string branch, string path);
 		void StoreDocFile(string branch, string path, DocFile file);
+		void StoreAsset(string branch, string path, Stream assetStream);
 	}
 }

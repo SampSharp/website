@@ -13,21 +13,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.IO;
-using System.Linq;
-using Markdig.Extensions.Tables;
-using Markdig.Renderers;
-using Markdig.Renderers.Html;
-
-namespace SampSharp.Documentation.Markdown.Renderers
+namespace SampSharp.Documentation.Configuration
 {
-	public class CustomHtmlRenderer : HtmlRenderer
+	public class ImportOptions
 	{
-		public CustomHtmlRenderer(TextWriter writer) : base(writer)
-		{
-			ObjectRenderers.Remove(ObjectRenderers.OfType<HeadingRenderer>().First());
-			ObjectRenderers.Add(new CustomHeadingRenderer());
-			ObjectRenderers.Add(new HtmlTableRenderer());
-		}
+		public string[] AcceptedAssets { get; set; }
 	}
 }

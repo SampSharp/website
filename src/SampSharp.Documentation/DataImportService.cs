@@ -20,8 +20,10 @@ using System.IO.Compression;
 using System.Linq;
 using System.Threading.Tasks;
 using Markdig;
+using Microsoft.Extensions.Options;
 using PlayNow.StarTar;
 using PlayNow.StarTar.Headers;
+using SampSharp.Documentation.Configuration;
 using SampSharp.Documentation.Markdown.Renderers;
 using SampSharp.Documentation.Models;
 using SampSharp.Documentation.Repositories;
@@ -32,12 +34,14 @@ namespace SampSharp.Documentation
 	{
 		private static readonly char[] LineBreaks = { '\r', '\n' };
 		private readonly IDataRepository _dataRepository;
+		private readonly IOptions<ImportOptions> _options;
 		private readonly IGithubDataRepository _githubDataRepository;
 
-		public DataImportService(IGithubDataRepository githubDataRepository, IDataRepository dataRepository)
+		public DataImportService(IGithubDataRepository githubDataRepository, IDataRepository dataRepository, IOptions<ImportOptions> options)
 		{
 			_githubDataRepository = githubDataRepository;
 			_dataRepository = dataRepository;
+			_options = options;
 		}
 
 
@@ -186,47 +190,67 @@ namespace SampSharp.Documentation
 					while (tarReader.Next() is var entry && entry != null)
 					{
 						if (entry.Header.Flag == TarHeaderFlag.Directory && rootDirectory == null) rootDirectory = entry.Header.Name;
-						if (entry.Header.Flag == TarHeaderFlag.NormalFile && Path.GetExtension(entry.Header.Name) == ".md")
+						if (entry.Header.Flag == TarHeaderFlag.NormalFile)
 						{
-							using (var streamReader = new StreamReader(entry))
+							if (Path.GetExtension(entry.Header.Name) == ".md")
 							{
-								var markdown = streamReader.ReadToEnd();
-
-								var meta = ParseMeta(ref markdown);
-
-								// Parse markdown
-								var document = Markdig.Markdown.Parse(markdown, 
-                                    new MarkdownPipelineBuilder()
-                                    .UseAdvancedExtensions()
-                                    .Build());
-
-								var sw = new StringWriter();
-								var renderer = new CustomHtmlRenderer(sw);
-								renderer.Render(document);
-								sw.Flush();
-								var html = sw.ToString();
-
-								var file = new DocFile
+								using (var streamReader = new StreamReader(entry))
 								{
-									Content = html,
-									Meta = meta
-								};
+									var markdown = streamReader.ReadToEnd();
 
-								var docPath = entry.Header.Name;
+									var meta = ParseMeta(ref markdown);
 
-								if (rootDirectory != null && docPath.StartsWith(rootDirectory))
-									docPath = docPath.Substring(rootDirectory.Length).TrimStart('/', '\\');
+									// Parse markdown
+									var document = Markdig.Markdown.Parse(markdown,
+										new MarkdownPipelineBuilder()
+											.UseAdvancedExtensions()
+											.UsePipeTables()
+											.Build());
 
-								var fileName = Path.GetFileNameWithoutExtension(docPath);
-								docPath = Path.Combine(Path.GetDirectoryName(docPath), fileName);
+									var sw = new StringWriter();
+									var renderer = new CustomHtmlRenderer(sw);
+									renderer.Render(document);
+									sw.Flush();
+									var html = sw.ToString();
 
-								if (fileName == "index") version.DefaultPage = meta.RedirectPage;
+									var file = new DocFile
+									{
+										Content = html,
+										Meta = meta
+									};
 
-								meta.LastModification = entry.Header.LastModification ?? DateTime.UtcNow;
-								meta.EditUrl = $"{_githubDataRepository.PublicUrl}/blob/{branch.Name}/{docPath}.md";
-								meta.Title = meta.Title ?? fileName.Replace('-', ' ');
+									var docPath = entry.Header.Name;
 
-								_dataRepository.StoreDocFile(branch.Name, docPath, file);
+									if (rootDirectory != null && docPath.StartsWith(rootDirectory))
+										docPath = docPath.Substring(rootDirectory.Length).TrimStart('/', '\\');
+
+									var fileName = Path.GetFileNameWithoutExtension(docPath);
+									docPath = Path.Combine(Path.GetDirectoryName(docPath), fileName);
+
+									if (fileName == "index") version.DefaultPage = meta.RedirectPage;
+
+									meta.LastModification = entry.Header.LastModification ?? DateTime.UtcNow;
+									meta.EditUrl = $"{_githubDataRepository.PublicUrl}/blob/{branch.Name}/{docPath}.md";
+									meta.Title = meta.Title ?? fileName.Replace('-', ' ');
+
+									_dataRepository.StoreDocFile(branch.Name, docPath, file);
+								}
+							}
+							else
+							{
+								var assetPath = entry.Header.Name;
+
+								if (rootDirectory != null && assetPath.StartsWith(rootDirectory))
+									assetPath = assetPath.Substring(rootDirectory.Length).TrimStart('/', '\\');
+
+								assetPath = assetPath.ToLower();
+
+								// Skip unaccepted asset types
+								if (_options.Value.AcceptedAssets.Contains(Path.GetExtension(assetPath)))
+								{
+									_dataRepository.StoreAsset(branch.Name, assetPath, entry);
+								}
+
 							}
 						}
 					}

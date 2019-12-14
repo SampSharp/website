@@ -39,6 +39,7 @@ namespace SampSharp.Documentation
 
 			services.Configure<RepositoryOptions>(Configuration.GetSection("Repository"));
 			services.Configure<StorageOptions>(Configuration.GetSection("Storage"));
+			services.Configure<ImportOptions>(Configuration.GetSection("Import"));
 
 			services.AddTransient<IDataImportService, DataImportService>();
 			services.AddTransient<IVersionBuilder, VersionBuilder>();
@@ -48,9 +49,12 @@ namespace SampSharp.Documentation
 		}
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-		public void Configure(IApplicationBuilder app, IHostingEnvironment env, IDataImportService dataImportService)
+		public void Configure(IApplicationBuilder app, IHostingEnvironment env, IDataImportService dataImportService, IDataRepository dataRepository)
 		{
-			dataImportService.ImportAllBranches();
+#if !DEBUG
+			if (dataRepository.IsEmpty)
+#endif
+				dataImportService.ImportAllBranches();
 			
 			if (env.IsDevelopment())
 				app.UseDeveloperExceptionPage();

@@ -15,6 +15,7 @@
 
 using System;
 using System.IO;
+using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using SampSharp.Documentation.Configuration;
@@ -45,6 +46,8 @@ namespace SampSharp.Documentation.Repositories
 				return p;
 			}
 		}
+
+		public bool IsEmpty => !Directory.GetFiles(DataPath).Any();
 
 		private Stream Read(string path)
 		{
@@ -171,6 +174,26 @@ namespace SampSharp.Documentation.Repositories
 
 			File.WriteAllText(htmlPath, file.Content);
 			File.WriteAllText(metaPath, metaString);
+		}
+		
+		public void StoreAsset(string branch, string path, Stream assetStream)
+		{
+			if (branch == null) throw new ArgumentNullException(nameof(branch));
+			if (path == null) throw new ArgumentNullException(nameof(path));
+			if (assetStream == null) throw new ArgumentNullException(nameof(assetStream));
+
+			path = AbsolutePath(branch, path.ToLower());
+
+			if (File.Exists(path)) throw new Exception("File already exists");
+
+			var directory = Path.GetDirectoryName(path);
+			Directory.CreateDirectory(directory);
+
+			using (var fs = File.OpenWrite(path))
+			{
+				assetStream.CopyTo(fs);
+				fs.Flush();
+			}
 		}
 
 		public void DeleteBranch(string branch)
