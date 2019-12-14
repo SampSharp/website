@@ -14,21 +14,12 @@
 // limitations under the License.
 
 using System.IO;
-using SampSharp.Documentation.Models;
 
-namespace SampSharp.Documentation.Repositories
+namespace SampSharp.Documentation.Models
 {
-	public interface IDataRepository
+	public class DocAsset
 	{
-		bool IsEmpty { get; }
-
-		void DeleteBranch(string branch);
-		bool DocExists(string branch, string path);
-		DocConfiguration GetDocConfiguration();
-		void StoreDocConfiguration(DocConfiguration config);
-		DocFile GetDocFile(string branch, string path);
-		void StoreDocFile(string branch, string path, DocFile file);
-		(Stream, string) GetAsset(string branch, string path);
-		void StoreAsset(string branch, string path, Stream assetStream);
+		public Stream Stream { get; set; }
+		public string Mime { get; set; }
 	}
 }

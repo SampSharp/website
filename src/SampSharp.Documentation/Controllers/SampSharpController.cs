@@ -39,6 +39,7 @@ namespace SampSharp.Documentation.Controllers
 
 		protected VersionViewModel[] Versions => _versions ?? (_versions = _versionBuilder.GetAll());
 		public DocFile Page { get; private set; }
+		public DocAsset Asset { get; private set; }
 
 		protected SidebarViewModel Sidebar => new SidebarViewModel
 		{
@@ -80,6 +81,18 @@ namespace SampSharp.Documentation.Controllers
 				}
 				else
 				{
+					// versionOrPage could be an asset.
+					var (str, mime) = _dataRepository.GetAsset(defaultVersion.Tag, versionOrPage);
+					if (str != null && mime != null)
+					{
+						Asset = new DocAsset
+						{
+							Mime = mime,
+							Stream = str
+						};
+						return;
+					}
+
 					// versionOrPage must be a version.
 					version = versions.FirstOrDefault(v => v.Tag == versionOrPage);
 
@@ -99,12 +112,37 @@ namespace SampSharp.Documentation.Controllers
 			if (version == null)
 			{
 				FallbackVersion = defaultVersion;
+
+				page = versionOrPage + "/" + page;
+
+				var (str, mime) = _dataRepository.GetAsset(FallbackVersion.Tag, page);
+				if (str != null && mime != null)
+				{
+					Asset = new DocAsset
+					{
+						Mime = mime,
+						Stream = str
+					};
+				}
 				return;
 			}
 
 			Page = GetFile(version.Tag, page);
 			PageVersion = version;
 			FallbackVersion = version;
+
+			if (Page == null)
+			{
+				var (str, mime) = _dataRepository.GetAsset(version.Tag, page);
+				if (str != null && mime != null)
+				{
+					Asset = new DocAsset
+					{
+						Mime = mime,
+						Stream = str
+					};
+				}
+			}
 		}
 
 		protected DocFile GetFile(string version, string name)

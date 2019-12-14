@@ -15,6 +15,7 @@
 
 using System;
 using System.IO;
+using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -176,6 +177,22 @@ namespace SampSharp.Documentation.Repositories
 			File.WriteAllText(metaPath, metaString);
 		}
 		
+		public (Stream, string) GetAsset(string branch, string path)
+		{
+			if (branch == null) throw new ArgumentNullException(nameof(branch));
+			if (path == null) throw new ArgumentNullException(nameof(path));
+
+			path = AbsolutePath(branch, path.ToLower());
+
+			if (path == null || !File.Exists(path) || !File.Exists(path + ".asset")) return (null, null);
+
+			var fileStream = File.OpenRead(path);
+
+			new FileExtensionContentTypeProvider().TryGetContentType(path, out var contentType);
+
+			return (fileStream, contentType ?? "application/octet-stream");
+		}
+
 		public void StoreAsset(string branch, string path, Stream assetStream)
 		{
 			if (branch == null) throw new ArgumentNullException(nameof(branch));
@@ -194,6 +211,8 @@ namespace SampSharp.Documentation.Repositories
 				assetStream.CopyTo(fs);
 				fs.Flush();
 			}
+
+			File.WriteAllText(path + ".asset", "");
 		}
 
 		public void DeleteBranch(string branch)

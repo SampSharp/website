@@ -13,7 +13,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.IO;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Primitives;
+using Microsoft.Net.Http.Headers;
 using SampSharp.Documentation.Models;
 using SampSharp.Documentation.Repositories;
 
@@ -31,9 +35,9 @@ namespace SampSharp.Documentation.Controllers
 		{
 			SetCurrentPage(versionOrPage, page);
 
-			if (Page == null) return NotFound();
-			if (Page.Meta.RedirectUrl != null) return RedirectPermanent(Page.Meta.RedirectUrl);
-			if (Page.Meta.RedirectPage != null)
+			if (Page == null && Asset == null) return NotFound();
+			if (Page?.Meta.RedirectUrl != null) return RedirectPermanent(Page.Meta.RedirectUrl);
+			if (Page?.Meta.RedirectPage != null)
 			{
 				return RedirectToRoutePermanent("documentation",
 					new
@@ -41,6 +45,11 @@ namespace SampSharp.Documentation.Controllers
 						versionOrPage = PageVersion.Tag,
 						page = Page.Meta.RedirectPage
 					});
+			}
+
+			if (Asset != null)
+			{
+				return File(Asset.Stream, Asset.Mime);
 			}
 
 			return View(new DocumentationViewModel
