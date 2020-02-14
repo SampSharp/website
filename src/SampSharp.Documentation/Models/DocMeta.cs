@@ -14,6 +14,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 
 namespace SampSharp.Documentation.Models
 {
@@ -24,5 +25,7 @@ namespace SampSharp.Documentation.Models
 		public string RedirectPage { get; set; }
 		public DateTime LastModification { get; set; }
 		public string EditUrl { get; set; }
+		public string Introduction { get; set; }
+		public List<ArticleQuickLink> QuickLinks { get; set; }
 	}
 }

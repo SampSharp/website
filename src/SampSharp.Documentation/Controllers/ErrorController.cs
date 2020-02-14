@@ -14,20 +14,13 @@
 // limitations under the License.
 
 using System.Diagnostics;
-using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using SampSharp.Documentation.Models;
-using SampSharp.Documentation.Repositories;
 
 namespace SampSharp.Documentation.Controllers
 {
-	public class ErrorController : SampSharpController
+	public class ErrorController : Controller
 	{
-		public ErrorController(IVersionBuilder versionBuilder, IDataRepository dataRepository) :
-			base(versionBuilder, dataRepository)
-		{
-		}
-
 		[ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
 		public IActionResult ServerError()
 		{
@@ -40,11 +33,9 @@ namespace SampSharp.Documentation.Controllers
 		[ResponseCache(Duration = 60 * 15, Location = ResponseCacheLocation.Any)]
 		public IActionResult PageNotFound()
 		{
-			SetCurrentPage(Versions.First(v => v.IsDefault).Tag, SidebarName); // TODO: Actual current version
 			return View(new ErrorViewModel
 			{
-				RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier,
-				Sidebar = Sidebar
+				RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier
 			});
 		}
 	}

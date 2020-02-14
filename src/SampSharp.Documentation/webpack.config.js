@@ -25,7 +25,8 @@ module.exports = {
             options: {
               importLoaders: 2
             }
-          },
+          }
+          ,
           {
             loader: "postcss-loader",
             options: {
@@ -61,20 +62,20 @@ module.exports = {
           }
         ]
       },
-        {
-            // Adds support to load fonts
-            test: /\.(otf|eot|svg|ttf|woff|woff2)$/,
-            use: [
-                {
-                    loader: "file-loader",
-                    options: {
-                        name: "[name].[ext]",
-                        publicPath: "../fonts",
-                        emitFile: false
-                    }
-                }
-            ]
-        }
+      {
+          // Adds support to load fonts
+          test: /\.(otf|eot|svg|ttf|woff|woff2)$/,
+          use: [
+              {
+                  loader: "file-loader",
+                  options: {
+                      name: "[name].[ext]",
+                      publicPath: "../fonts",
+                      emitFile: false
+                  }
+              }
+          ]
+      }
     ]
   },
   plugins: [

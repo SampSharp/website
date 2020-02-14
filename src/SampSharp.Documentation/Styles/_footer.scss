@@ -1,0 +1,38 @@
+﻿.footer {
+    background: #f0f0f0;
+    min-height: 150px;
+    font-size: 0.75rem;
+    width: 100%;
+
+    .container {
+        padding: 25px;
+    }
+
+    span {
+        flex: 1;
+        font-style: italic;
+        color: #777;
+    }
+
+    ul {
+        list-style-type: none;
+        display: inline;
+        margin: 0;
+        padding: 0 0 0 20px;
+
+        li {
+            display: inline;
+            padding: 0 11px;
+
+            a {
+                font-size: 1em;
+                text-decoration: none;
+                color: #777;
+
+                &:hover {
+                    color: black;
+                }
+            }
+        }
+    }
+}

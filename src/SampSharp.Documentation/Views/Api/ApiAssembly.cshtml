@@ -1,0 +1,15 @@
+﻿@model ApiAssemblyViewModel
+
+<h1>@Model.Assembly.Name.Name</h1><!--TODO: To metadata-->
+<ul>
+    @foreach (var type in @Model.Types)
+    {
+        <li class="tree-item">
+            <span class="tree-expander">@type.Name</span>
+            <ul class="tree-group">
+                <li><a href="/api/@Model.Assembly.Name.Name/@Model.Assembly.Name.Version/@type.FullName">@type.Name</a></li>
+            </ul>
+        </li>
+    }
+</ul>
+

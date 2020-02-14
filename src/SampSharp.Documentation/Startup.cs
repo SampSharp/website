@@ -13,20 +13,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using SampSharp.Documentation.Configuration;
 using SampSharp.Documentation.Repositories;
+using SampSharp.Documentation.Services;
 
 namespace SampSharp.Documentation
 {
 	public class Startup
 	{
-		public Startup(IConfiguration configuration)
+		private readonly IWebHostEnvironment _webHostEnvironment;
+
+		public Startup(IConfiguration configuration, IWebHostEnvironment webHostEnvironment)
 		{
+			_webHostEnvironment = webHostEnvironment;
 			Configuration = configuration;
 		}
 
@@ -35,35 +41,52 @@ namespace SampSharp.Documentation
 		// This method gets called by the runtime. Use this method to add services to the container.
 		public void ConfigureServices(IServiceCollection services)
 		{
-			services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+			IMvcBuilder builder = services.AddRazorPages();
+
+#if DEBUG
+			if (_webHostEnvironment.IsDevelopment())
+			{
+				builder.AddRazorRuntimeCompilation();
+			}
+#endif
+
+			services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
 
 			services.Configure<RepositoryOptions>(Configuration.GetSection("Repository"));
 			services.Configure<StorageOptions>(Configuration.GetSection("Storage"));
 			services.Configure<ImportOptions>(Configuration.GetSection("Import"));
 
-			services.AddTransient<IDataImportService, DataImportService>();
-			services.AddTransient<IVersionBuilder, VersionBuilder>();
-			services.AddTransient<DataImportService>();
-			services.AddTransient<IDataRepository, DataRepository>();
+			services.AddTransient<IDocsImportService, DocsImportService>();
+			services.AddTransient<IDocsVersionBuilder, DocsVersionBuilder>();
+			services.AddTransient<ApiImportService>();
+			services.AddTransient<IDocumentationDataRepository, DocumentationDataRepository>();
+			services.AddTransient<IViewRenderService, ViewRenderService>();
 			services.AddTransient<IGithubDataRepository, GithubDataRepository>();
+
+			services.AddTransient<IStorageService, StorageService>();
+			services.AddTransient<IFileSystemService, FileSystemService>();
 		}
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-		public void Configure(IApplicationBuilder app, IHostingEnvironment env, IDataImportService dataImportService, IDataRepository dataRepository)
+		public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ApiImportService apiImportService, IDocsImportService docsImportService, IDocumentationDataRepository documentationDataRepository)
 		{
-#if !DEBUG
-			if (dataRepository.IsEmpty)
-#endif
-				dataImportService.ImportAllBranches();
-			
+			try
+			{
+				docsImportService.ImportAllBranches().Wait();
+				//apiImportService.ImportAllFromNuGet().Wait();
+			}
+			catch (Exception e)
+			{
+				Console.WriteLine(e);
+				throw;
+			}
+
 			if (env.IsDevelopment())
 				app.UseDeveloperExceptionPage();
 			else
-			{
 				app.UseExceptionHandler("/__internal/error/server_error");
 
-				app.UseHsts();
-			}
+			app.UseHsts();
 
 			app.Use(async (ctx, next) =>
 			{
@@ -82,18 +105,32 @@ namespace SampSharp.Documentation
 			app.UseHttpsRedirection();
 			app.UseStaticFiles();
 
-			app.UseMvc(routes =>
+			app.UseRouting();
+			app.UseEndpoints(endpoints =>
 			{
-				routes.MapRoute(
-					"home",
-					"/",
-					new
-					{
-						controller = "Home",
-						action = "Index"
-					});
+				// catch-all must come early because ASP.net is broken
+//				endpoints.MapControllerRoute(
+//					"documentation",
+//					"{versionOrPage?}/{*page}",
+//					new
+//					{
+//						controller = "Documentation",
+//						action = "Index"
+//					});
+				
+				endpoints.MapControllerRoute("home2", "/index2", new
+				{
+					controller = "Home",
+					action = "Index2"
+				});
 
-				routes.MapRoute(
+				endpoints.MapControllerRoute("home", "/", new
+				{
+					controller = "Home",
+					action = "Index"
+				});
+				
+				endpoints.MapControllerRoute(
 					"server_error",
 					"/__internal/error/server_error",
 					new
@@ -102,7 +139,7 @@ namespace SampSharp.Documentation
 						action = "ServerError"
 					});
 
-				routes.MapRoute(
+				endpoints.MapControllerRoute(
 					"not_found",
 					"/__internal/error/not_found",
 					new
@@ -111,7 +148,7 @@ namespace SampSharp.Documentation
 						action = "PageNotFound"
 					});
 
-				routes.MapRoute(
+				endpoints.MapControllerRoute(
 					"webhook_manual_all_branches",
 					"/webhook/all",
 					new
@@ -120,7 +157,7 @@ namespace SampSharp.Documentation
 						action = "ImportAllBranches"
 					});
 
-				routes.MapRoute(
+				endpoints.MapControllerRoute(
 					"webhook_github",
 					"/webhook/github",
 					new
@@ -128,15 +165,34 @@ namespace SampSharp.Documentation
 						controller = "WebHook",
 						action = "GitHub"
 					});
-
-				routes.MapRoute(
+				
+				endpoints.MapControllerRoute(
 					"documentation",
-					"{versionOrPage?}/{*page}",
+					"docs/{versionOrPage?}/{*page}",
 					new
 					{
 						controller = "Documentation",
 						action = "Index"
 					});
+
+				endpoints.MapControllerRoute(
+					"api",
+					"api/{assembly}/{version}",
+					new
+					{
+						controller = "Api",
+						action = "Assembly"
+					});
+
+				endpoints.MapControllerRoute(
+					"api",
+					"api/{assembly}/{version}/{type}",
+					new
+					{
+						controller = "Api",
+						action = "Type"
+					});
+
 			});
 		}
 	}

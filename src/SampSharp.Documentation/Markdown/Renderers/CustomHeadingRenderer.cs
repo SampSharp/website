@@ -77,7 +77,7 @@ namespace SampSharp.Documentation.Markdown.Renderers
 		/// <summary>
 		///     Convert a name into a string that can be appended to a Uri.
 		/// </summary>
-		private static string EscapeName(string name)
+		public static string EscapeName(string name)
 		{
 			if (!string.IsNullOrEmpty(name))
 			{

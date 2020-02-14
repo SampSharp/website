@@ -1,5 +1,5 @@
 ﻿// SampSharp.Documentation
-// Copyright 2019 Tim Potze
+// Copyright 2020 Tim Potze
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,53 +14,87 @@
 // limitations under the License.
 
 using System;
-using System.IO;
+using System.Linq;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Primitives;
-using Microsoft.Net.Http.Headers;
 using SampSharp.Documentation.Models;
 using SampSharp.Documentation.Repositories;
+using SampSharp.Documentation.Services;
 
 namespace SampSharp.Documentation.Controllers
 {
-	public class DocumentationController : SampSharpController
+	public class DocumentationController : Controller
 	{
-		public DocumentationController(IVersionBuilder versionBuilder, IDataRepository dataRepository) :
-			base(versionBuilder, dataRepository)
+		private readonly IDocumentationDataRepository _documentationDataRepository;
+		private readonly IDocsVersionBuilder _versionBuilder;
+
+		public DocumentationController(IDocsVersionBuilder versionBuilder, IDocumentationDataRepository documentationDataRepository)
 		{
+			_versionBuilder = versionBuilder;
+			_documentationDataRepository = documentationDataRepository;
 		}
 
 		[ResponseCache(Duration = 60 * 15, Location = ResponseCacheLocation.Any)]
 		public IActionResult Index(string versionOrPage = null, string page = null)
 		{
-			SetCurrentPage(versionOrPage, page);
-
-			if (Page == null && Asset == null) return NotFound();
-			if (Page?.Meta.RedirectUrl != null) return RedirectPermanent(Page.Meta.RedirectUrl);
-			if (Page?.Meta.RedirectPage != null)
+			// Legacy redirect
+			if (page == null)
 			{
+				var defaultVersion = _documentationDataRepository.GetDocConfiguration().DefaultVersion;
+
+				page = versionOrPage ?? defaultVersion.DefaultPage;
+				versionOrPage = defaultVersion.Tag;
+
 				return RedirectToRoutePermanent("documentation",
 					new
 					{
-						versionOrPage = PageVersion.Tag,
-						page = Page.Meta.RedirectPage
+						versionOrPage,
+						page
 					});
 			}
 
-			if (Asset != null)
+			// Collect info
+			if (versionOrPage == null) throw new ArgumentNullException(nameof(versionOrPage));
+
+			var versions = _versionBuilder.GetAll();
+			var version = versions.FirstOrDefault(v => v.Tag == versionOrPage);
+
+			if (version == null) return NotFound();
+
+			var lowerVersion = versionOrPage.ToLower();
+			var lowerName = page.ToLower();
+
+			var docPage = _documentationDataRepository.GetDocFile(lowerVersion, lowerName);
+
+			// Asset
+			if (docPage == null)
 			{
-				return File(Asset.Stream, Asset.Mime);
+				var (str, mime) = _documentationDataRepository.GetAsset(version.Tag, page);
+
+				return str != null && mime != null
+					? (IActionResult) File(str, mime)
+					: NotFound();
 			}
 
+			// Redirects
+			if (docPage.Meta.RedirectUrl != null)
+				return RedirectPermanent(docPage.Meta.RedirectUrl);
+			if (docPage.Meta.RedirectPage != null)
+				return RedirectToRoutePermanent("documentation",
+					new
+					{
+						versionOrPage = version.Tag,
+						page = docPage.Meta.RedirectPage
+					});
+
+			// Actual documentation
 			return View(new DocumentationViewModel
 			{
-				Version = PageVersion,
-				Title = Page.Meta.Title,
-				Content = Page.Content,
-				LastModification = Page.Meta.LastModification,
-				Sidebar = Sidebar,
-				VersionPicker = VersionPicker,
-				EditUrl = Page.Meta.EditUrl
+				Title = docPage.Meta.Title,
+				Content = docPage.Content,
+				LastModification = docPage.Meta.LastModification,
+				EditUrl = docPage.Meta.EditUrl,
+				Introduction = docPage.Meta.Introduction,
+				QuickLinks = docPage.Meta.QuickLinks
 			});
 		}
 	}

@@ -1,6 +1,7 @@
 ﻿
 hljs.initHighlightingOnLoad();
 
+// version dropdown
 document.querySelectorAll('.dropdown')
     .forEach(function (dropdown) {
         dropdown.addEventListener('click', function (ev) {
@@ -14,3 +15,23 @@ document.querySelectorAll('.dropdown')
             ev.preventDefault();
         });
     });
+
+// expanding clicking
+document.querySelectorAll('.tree-expander')
+    .forEach(function(expander) {
+        expander.addEventListener('click',
+            function(ev) {
+                expander.parentElement.classList.toggle('is-expanded');
+            });
+    });
+
+// auto expand active page
+window.onload = function() {
+    document.querySelectorAll('.tree-group a')
+        .forEach(function(anchor) {
+            if (anchor.href === location.protocol + '//' + location.host + location.pathname) {
+                anchor.parentElement.classList.add('is-active');
+                anchor.closest('.tree-item').classList.add('is-expanded');
+            }
+        });
+};

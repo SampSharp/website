@@ -4,14 +4,36 @@
     ViewData["Title"] = Model.Title;
 }
 
-<h1>
-    @Model.Title
+@section ToolButtons
+{
+    <a class="breadcrumbs-button not-mobile" href="@Model.EditUrl">
+        <i class="fa fa-edit"></i> Edit on GitHub
+    </a>
+}
 
-    <small class="edit">
-        <a href="@Model.EditUrl">
-            <i class="fa fa-github"></i> Edit this page on GitHub
-        </a>
-    </small>
-</h1>
+@section Introduction
+{
+    @Html.Raw(Model.Introduction)
+}
+
+@section InThisArticleInline
+{
+    @foreach (var link in Model.QuickLinks)
+    {
+        <li>
+            <a href="@link.Link">@link.Name</a>
+        </li>
+    }
+}
+
+@section InThisArticle
+{
+    @foreach (var link in Model.QuickLinks)
+    {
+        <li>
+            <a href="@link.Link">@link.Name</a>
+        </li>
+    }
+}
 
 @Html.Raw(Model.Content)

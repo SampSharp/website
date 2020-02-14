@@ -1,0 +1,54 @@
+﻿
+ul.tree {
+    li {
+        a {
+            color: black;
+        }
+
+        line-height: 25px;
+    }
+
+    .tree-item {
+        .tree-expander {
+            &:before {
+                font: normal normal normal 14px/1 FontAwesome;
+                font-size: 14px;
+                text-rendering: auto;
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
+                content: "\f054"; // chevron-right
+                display: inline-block;
+                transition: transform 0.1s linear;
+                padding: 0 5px;
+            }
+
+            cursor: pointer;
+            text-decoration: none;
+            font-weight: 500;
+            color: black;
+            user-select: none;
+        }
+
+        .is-active {
+            background: #f2f2f2;
+        }
+
+        .tree-group {
+            display: none;
+            padding-left: 30px;
+            list-style: none;
+        }
+
+        &.is-expanded {
+            .tree-expander:before {
+                transform: rotate(90deg);
+            }
+
+            .tree-group {
+                display: block;
+            }
+        }
+    }
+
+    list-style: none;
+}

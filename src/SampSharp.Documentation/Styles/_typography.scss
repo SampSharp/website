@@ -1,0 +1,18 @@
+﻿body {
+    font-family: 'Raleway', sans-serif;
+    font-size: 16px;
+    line-height: 21px;
+    color: black;
+}
+
+a {
+    color: #b00009;
+    text-decoration: none;
+
+    &:hover {
+        color: darken(#b00009, 10%);
+        text-decoration: underline;
+    }
+}
+
+

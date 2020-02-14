@@ -1,0 +1,22 @@
+﻿.can-float {
+    &.is-floating {
+        position: fixed;
+        top: 0;
+    }
+
+    width: inherit;
+    max-width: inherit;
+    //overflow-y: hidden;
+    display: flex;
+    flex-direction: column;
+
+    .float-header {
+        flex: 0 0 auto;
+    }
+
+    .float-content {
+        display: block;
+        flex: 1 1 auto;
+        overflow: auto;
+    }
+}

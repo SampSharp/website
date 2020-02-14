@@ -1,0 +1,136 @@
+﻿@import 'mixins';
+
+.wide-container {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    width: 100%;
+
+    .nav-container {
+        width: 25vw;
+        max-width: 340px;
+        flex-shrink: 0;
+
+        @include for-tablet {
+            width: 35vw;
+        }
+
+        .mobile-header {
+            display: none;
+        }
+
+        @include for-mobile {
+            display: none;
+
+            .mobile-header {
+                display: flex;
+                flex-direction: row;
+                height: 85px;
+
+                span {
+                    font-weight: 600;
+                    font-size: 1.2em;
+                    height: 100%;
+                    flex: 1;
+                    display: inline-flex;
+                    align-items: center;
+                    padding-left: 25px;
+                }
+
+                a {
+                    height: 100%;
+                    font-size: 1.8em;
+                    width: 85px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    text-decoration: none;
+                    color: black;
+                }
+            }
+
+            &.is-open {
+                display: block;
+                z-index: 10000;
+                position: fixed;
+                top: 0;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                background-color: rgba(0,0,0,0.8);
+                max-width: 100vw;
+                width: 100vw;
+
+                .can-float {
+                    position: initial;
+                    max-width: 340px;
+                    width: 100vw;
+                    background: white;
+                    height: 100% !important; // overwite scripted values
+                }
+            }
+
+            .can-float {
+                --disable-float: 1;
+            }
+        }
+    }
+
+    main {
+        padding: 20px 20px 40px;
+        min-width: 0; // weird flexbox overflow behaviour https://stackoverflow.com/questions/28636832/firefox-overflow-y-not-working-with-nested-flexbox/28639686#28639686
+        flex: 1;
+
+        .content-body {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+    }
+    // Any article nav
+    .article-nav {
+        .header {
+            font-weight: 600;
+        }
+
+        ul.content {
+            list-style: none;
+            padding-left: 10px;
+
+            li {
+                line-height: 25px;
+            }
+        }
+    }
+    // Article nav in article
+    .article-nav-inline {
+        display: block;
+
+        @include for-desktop {
+            display: none;
+        }
+    }
+    // Article nav in right container
+    .article-nav-container {
+        div {
+            padding: 25px 0 0 0;
+        }
+
+        .can-float {
+            --disable-float: 1;
+        }
+
+        @include for-desktop {
+            display: block;
+
+            .can-float {
+                --disable-float: 0 !important;
+            }
+        }
+
+        width: 230px;
+        max-width: 20vw;
+        display: none;
+        flex-shrink: 0;
+    }
+}

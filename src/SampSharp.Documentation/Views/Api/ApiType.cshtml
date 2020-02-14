@@ -1,0 +1,15 @@
+﻿@model ApiTypeViewModel
+
+<h1>@Model.Type.Name</h1><!--TODO: To metadata-->
+
+Namespace: @Model.Type.Namespace<br/>
+Assembly: @(Model.Type.Assembly.Name.Name).dll<br/>
+@Model.Type?.Documentation?.Summary
+
+<h2>Methods</h2>
+<ul>
+    @foreach (var method in Model.Type.Methods)
+    {
+        <li>@method.Name</li>
+    }
+</ul>

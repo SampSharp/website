@@ -22,17 +22,18 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using SampSharp.Documentation.Configuration;
+using SampSharp.Documentation.Services;
 
 namespace SampSharp.Documentation.Controllers
 {
 	public class WebHookController : Controller
 	{
-		private readonly IDataImportService _dataImportService;
+		private readonly IDocsImportService _docsImportService;
 		private readonly IOptions<RepositoryOptions> _repositoryOptions;
 
-		public WebHookController(IDataImportService dataImportService, IOptions<RepositoryOptions> repositoryOptions)
+		public WebHookController(IDocsImportService docsImportService, IOptions<RepositoryOptions> repositoryOptions)
 		{
-			_dataImportService = dataImportService;
+			_docsImportService = docsImportService;
 			_repositoryOptions = repositoryOptions;
 		}
 
@@ -44,7 +45,7 @@ namespace SampSharp.Documentation.Controllers
 
 			if (Request.Headers["Authorization"].FirstOrDefault() == "Bearer " + _repositoryOptions.Value.Secret)
 			{
-				_dataImportService.ImportAllBranches();
+				_docsImportService.ImportAllBranches();
 				return NoContent();
 			}
 
@@ -97,7 +98,7 @@ namespace SampSharp.Documentation.Controllers
 					if (!ValidateRequest(ghHubSignature, body))
 						return Unauthorized();
 
-					await _dataImportService.ImportAllBranches();
+					await _docsImportService.ImportAllBranches();
 				}
 			}
 
