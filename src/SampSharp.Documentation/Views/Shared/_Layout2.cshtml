@@ -14,10 +14,10 @@
             <a class="menu-toggle" href="#menu" data-toggle-target=".menu-list, .menu-toggle" data-toggle-class="is-open">
                 <i class="fa fa-bars"></i>
             </a>
-            <a class="brand logo" href="#">
+            <a class="brand logo" href="/">
                 <img alt="SampSharp" src="/images/sampsharp.png">
             </a>
-            <a class="brand" href="#">
+            <a class="brand" href="/">
                 <strong>
                     SampSharp
                 </strong>
@@ -25,41 +25,36 @@
 
             <ul class="menu-list">
                 <li>
-                    <a href="#">Documentation</a>
+                    <a href="/docs">Documentation</a>
                 </li>
                 <li>
-                    <a href="#">API</a>
+                    <a href="/api">API</a>
                 </li>
                 <li>
-                    <a href="#">GitHub</a>
+                    <a href="http://github.com/ikkentim/SampSharp">GitHub</a>
                 </li>
                 <li>
-                    <a href="#">Download</a>
+                    <a href="http://github.com/ikkentim/SampSharp/releases">Download</a>
                 </li>
             </ul>
 
             <div class="menu-placeholder"></div>
         </div>
     </div>
-    <div class="breadcrumbs">
-        <div class="container">
-            <ul>
-                <li>
-                    <a href="#">SampSharp</a>
-                </li>
-                <li>
-                    <a href="#">Documentation</a>
-                </li>
-                <li>
-                    <a href="#">Page group</a>
-                </li>
-            </ul>
-            @RenderSection("ToolButtons", false)
-            <a class="breadcrumbs-button for-mobile-flex" href="#content" data-toggle-target=".nav-container" data-toggle-class="is-open">
-                <i class="fa fa-list"></i> Contents
-            </a>
+    @if (IsSectionDefined("Breadcrumbs") || IsSectionDefined("ToolButtons"))
+    {
+        <div class="breadcrumbs">
+            <div class="container">
+                <ul>
+                    @RenderSection("Breadcrumbs", false)
+                </ul>
+                @RenderSection("ToolButtons", false)
+                <a class="breadcrumbs-button for-mobile-flex" href="#content" data-toggle-target=".nav-container" data-toggle-class="is-open">
+                    <i class="fa fa-list"></i> Contents
+                </a>
+            </div>
         </div>
-    </div>
+    }
 </div>
 <div class="wide-container">
 <div class="container">
@@ -78,161 +73,7 @@
         </div>
         <nav class="float-content">
             <ul class="tree">
-                <li class="tree-item is-expanded">
-                    <span class="tree-expander">Getting Started</span>
-                    <ul class="tree-group">
-                        <li>
-                            <a href="introduction">Introduction</a>
-                        </li>
-                        <li class="is-active">
-                            <a href="getting-started">Getting Started</a>
-                        </li>
-                        <li>
-                            <a href="running-in-production">Running in Production</a>
-                        </li>
-                        <li>
-                            <a href="configuration">Configuration</a>
-                        </li>
-                        <li>
-                            <a href="common-problems-on-linux">Common Problems on Linux</a>
-                        </li>
-                    </ul>
-                </li>
-
-                <li class="tree-item is-expanded">
-                    <span class="tree-expander">Basics</span>
-                    <ul class="tree-group">
-                        <li>
-                            <a href="gamemode">GameMode</a>
-                        </li>
-                        <li>
-                            <a href="players">Players</a>
-                        </li>
-                        <li>
-                            <a href="dialogs">Dialogs</a>
-                        </li>
-                        <li>
-                            <a href="player-commands">Player-Commands</a>
-                        </li>
-                        <li>
-                            <a href="accessing-server.cfg">Accessing server.cfg</a>
-                        </li>
-                        <li>
-                            <a href="controllers">Controllers</a>
-                        </li>
-                    </ul>
-                </li>
-
-                <li class="tree-item is-expanded">
-                    <span class="tree-expander">Basics</span>
-                    <ul class="tree-group">
-                        <li>
-                            <a href="gamemode">GameMode</a>
-                        </li>
-                        <li>
-                            <a href="players">Players</a>
-                        </li>
-                        <li>
-                            <a href="dialogs">Dialogs</a>
-                        </li>
-                        <li>
-                            <a href="player-commands">Player-Commands</a>
-                        </li>
-                        <li>
-                            <a href="accessing-server.cfg">Accessing server.cfg</a>
-                        </li>
-                        <li>
-                            <a href="controllers">Controllers</a>
-                        </li>
-                    </ul>
-                </li>
-
-                <li class="tree-item is-expanded">
-                    <span class="tree-expander">Basics</span>
-                    <ul class="tree-group">
-                        <li>
-                            <a href="gamemode">GameMode</a>
-                        </li>
-                        <li>
-                            <a href="players">Players</a>
-                        </li>
-                        <li>
-                            <a href="dialogs">Dialogs</a>
-                        </li>
-                        <li>
-                            <a href="player-commands">Player-Commands</a>
-                        </li>
-                        <li>
-                            <a href="accessing-server.cfg">Accessing server.cfg</a>
-                        </li>
-                        <li>
-                            <a href="controllers">Controllers</a>
-                        </li>
-                    </ul>
-                </li>
-
-                <li class="tree-item is-expanded">
-                    <span class="tree-expander">Basics</span>
-                    <ul class="tree-group">
-                        <li>
-                            <a href="gamemode">GameMode</a>
-                        </li>
-                        <li>
-                            <a href="players">Players</a>
-                        </li>
-                        <li>
-                            <a href="dialogs">Dialogs</a>
-                        </li>
-                        <li>
-                            <a href="player-commands">Player-Commands</a>
-                        </li>
-                        <li>
-                            <a href="accessing-server.cfg">Accessing server.cfg</a>
-                        </li>
-                        <li>
-                            <a href="controllers">Controllers</a>
-                        </li>
-                    </ul>
-                </li>
-
-                <li class="tree-item is-expanded">
-                    <span class="tree-expander">Basics</span>
-                    <ul class="tree-group">
-                        <li>
-                            <a href="gamemode">GameMode</a>
-                        </li>
-                        <li>
-                            <a href="players">Players</a>
-                        </li>
-                        <li>
-                            <a href="dialogs">Dialogs</a>
-                        </li>
-                        <li>
-                            <a href="player-commands">Player-Commands</a>
-                        </li>
-                        <li>
-                            <a href="accessing-server.cfg">Accessing server.cfg</a>
-                        </li>
-                        <li>
-                            <a href="controllers">Controllers</a>
-                        </li>
-                    </ul>
-                </li>
-
-                <li class="tree-item is-expanded">
-                    <span class="tree-expander">Advanced</span>
-                    <ul class="tree-group">
-                        <li>
-                            <a href="threading">Threading</a>
-                        </li>
-                        <li>
-                            <a href="callbacks">Callbacks</a>
-                        </li>
-                        <li>
-                            <a href="natives">Natives</a>
-                        </li>
-                    </ul>
-                </li>
+                @RenderSection("ContentMenu")
             </ul>
         </nav>
     </div>
@@ -283,13 +124,13 @@
         </span>
         <ul>
             <li>
-                <a href="#">Forums</a>
+                <a href="http://forum.sa-mp.com/showthread.php?t=511686">Forums</a>
             </li>
             <li>
-                <a href="#">Slack Chat</a>
+                <a href="http://sampsharp.herokuapp.com/">Slack Chat</a>
             </li>
             <li>
-                <a href="#">Report a Bug</a>
+                <a href="https://github.com/ikkentim/SampSharp/issues/">Report a Bug</a>
             </li>
         </ul>
     </div>

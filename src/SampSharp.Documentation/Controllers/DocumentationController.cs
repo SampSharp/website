@@ -34,33 +34,33 @@ namespace SampSharp.Documentation.Controllers
 		}
 
 		[ResponseCache(Duration = 60 * 15, Location = ResponseCacheLocation.Any)]
-		public IActionResult Index(string versionOrPage = null, string page = null)
+		public IActionResult Index(string version = null, string page = null)
 		{
 			// Legacy redirect
 			if (page == null)
 			{
 				var defaultVersion = _documentationDataRepository.GetDocConfiguration().DefaultVersion;
 
-				page = versionOrPage ?? defaultVersion.DefaultPage;
-				versionOrPage = defaultVersion.Tag;
+				page = version ?? defaultVersion.DefaultPage;
+				version = defaultVersion.Tag;
 
-				return RedirectToRoutePermanent("documentation",
+				return RedirectToRoutePermanent("docs",
 					new
 					{
-						versionOrPage,
+						versionOrPage = version,
 						page
 					});
 			}
 
 			// Collect info
-			if (versionOrPage == null) throw new ArgumentNullException(nameof(versionOrPage));
+			if (version == null) throw new ArgumentNullException(nameof(version));
 
 			var versions = _versionBuilder.GetAll();
-			var version = versions.FirstOrDefault(v => v.Tag == versionOrPage);
+			var versionObj = versions.FirstOrDefault(v => v.Tag == version);
 
-			if (version == null) return NotFound();
+			if (versionObj == null) return NotFound();
 
-			var lowerVersion = versionOrPage.ToLower();
+			var lowerVersion = version.ToLower();
 			var lowerName = page.ToLower();
 
 			var docPage = _documentationDataRepository.GetDocFile(lowerVersion, lowerName);
@@ -68,7 +68,7 @@ namespace SampSharp.Documentation.Controllers
 			// Asset
 			if (docPage == null)
 			{
-				var (str, mime) = _documentationDataRepository.GetAsset(version.Tag, page);
+				var (str, mime) = _documentationDataRepository.GetAsset(versionObj.Tag, page);
 
 				return str != null && mime != null
 					? (IActionResult) File(str, mime)
@@ -79,10 +79,10 @@ namespace SampSharp.Documentation.Controllers
 			if (docPage.Meta.RedirectUrl != null)
 				return RedirectPermanent(docPage.Meta.RedirectUrl);
 			if (docPage.Meta.RedirectPage != null)
-				return RedirectToRoutePermanent("documentation",
+				return RedirectToRoutePermanent("docs",
 					new
 					{
-						versionOrPage = version.Tag,
+						versionOrPage = versionObj.Tag,
 						page = docPage.Meta.RedirectPage
 					});
 
@@ -94,7 +94,8 @@ namespace SampSharp.Documentation.Controllers
 				LastModification = docPage.Meta.LastModification,
 				EditUrl = docPage.Meta.EditUrl,
 				Introduction = docPage.Meta.Introduction,
-				QuickLinks = docPage.Meta.QuickLinks
+				QuickLinks = docPage.Meta.QuickLinks,
+				Menu = versionObj.Menu
 			});
 		}
 	}

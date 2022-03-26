@@ -14,6 +14,7 @@
 // limitations under the License.
 
 using System.Net;
+using SampSharp.Documentation.Services;
 
 namespace SampSharp.Documentation.Models
 {
@@ -30,5 +31,7 @@ namespace SampSharp.Documentation.Models
 		public string DefaultPageUri => IsDefault
 			? $"/{WebUtility.UrlEncode(DefaultPage)}"
 			: $"/{WebUtility.UrlEncode(Tag)}/{WebUtility.UrlEncode(DefaultPage)}";
+
+		public TreeEntry[] Menu { get; set; }
 	}
 }

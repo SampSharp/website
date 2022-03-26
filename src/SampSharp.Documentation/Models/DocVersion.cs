@@ -13,6 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using SampSharp.Documentation.Services;
+
 namespace SampSharp.Documentation.Models
 {
 	public class DocVersion
@@ -28,6 +30,7 @@ namespace SampSharp.Documentation.Models
 		public string DisplayName { get; set; }
 
 		public string DefaultPage { get; set; }
+		public TreeEntry[] Menu { get; set; }
 
 		#region Equality members
 

@@ -14,6 +14,7 @@
 // limitations under the License.
 
 using System;
+using SampSharp.Documentation.Services;
 
 namespace SampSharp.Documentation.Models
 {
@@ -22,5 +23,6 @@ namespace SampSharp.Documentation.Models
 		public string Content { get; set; }
 		public DateTime LastModification { get; set; }
 		public string EditUrl { get; set; }
+		public TreeEntry[] Menu { get; set; }
 	}
 }

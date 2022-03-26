@@ -8,6 +8,11 @@ namespace SampSharp.Documentation.Services
 	{
 		private readonly IFileSystemService _fileSystemService;
 
+		private JsonSerializerSettings _settings = new JsonSerializerSettings
+		{
+			TypeNameHandling = TypeNameHandling.Objects
+		};
+
 		public StorageService(IFileSystemService fileSystemService)
 		{
 			_fileSystemService = fileSystemService;
@@ -17,7 +22,7 @@ namespace SampSharp.Documentation.Services
 		{
 			if (key == null) throw new ArgumentNullException(nameof(key));
 			if (value == null) throw new ArgumentNullException(nameof(value));
-			_fileSystemService.WriteAllText(key.KeyPath, JsonConvert.SerializeObject(value));
+			_fileSystemService.WriteAllText(key.KeyPath, JsonConvert.SerializeObject(value, _settings));
 		}
 
 		public void DeleteSet(StorageKey key)
@@ -35,7 +40,8 @@ namespace SampSharp.Documentation.Services
 
 			var txt = _fileSystemService.ReadAllText(key.KeyPath);
 
-			return JsonConvert.DeserializeObject<T>(txt);
+			return JsonConvert.DeserializeObject<T>(txt, _settings);
+
 		}
 
 		public bool ObjectExists(StorageKey key)

@@ -38,7 +38,8 @@ namespace SampSharp.Documentation.Services
 					DisplayName = v.DisplayName,
 					Tag = v.Tag,
 					IsDefault = v == def.DefaultVersion,
-					DefaultPage = v.DefaultPage?.ToLower()
+					DefaultPage = v.DefaultPage?.ToLower(),
+					Menu = v.Menu
 				}).ToArray();
 		}
 	}

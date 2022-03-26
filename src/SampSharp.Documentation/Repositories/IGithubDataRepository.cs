@@ -15,6 +15,7 @@
 
 using System.Threading.Tasks;
 using SampSharp.Documentation.Models;
+using SampSharp.Documentation.NewModels;
 
 namespace SampSharp.Documentation.Repositories
 {
@@ -24,5 +25,6 @@ namespace SampSharp.Documentation.Repositories
 
 		Task<byte[]> GetArchive(GithubBranch branch);
 		Task<GithubBranch[]> GetBranches();
+		Task<GithubBranch> GetBranch(string branchName);
 	}
 }

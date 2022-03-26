@@ -18,7 +18,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Octokit;
 using SampSharp.Documentation.Configuration;
-using SampSharp.Documentation.Models;
+using SampSharp.Documentation.NewModels;
 
 namespace SampSharp.Documentation.Repositories
 {
@@ -32,7 +32,7 @@ namespace SampSharp.Documentation.Repositories
 			_options = options;
 			_client = new GitHubClient(new ProductHeaderValue("SampSharpDocs"));
 		}
-
+		
 		public async Task<GithubBranch[]> GetBranches()
 		{
 			var repo = await _client.Repository.Get(_options.Value.Owner, _options.Value.Name);
@@ -46,6 +46,25 @@ namespace SampSharp.Documentation.Repositories
 				Sha = b.Commit.Sha,
 				IsDefault = b.Name == defaultBranch
 			}).ToArray();
+		}
+
+		public async Task<GithubBranch> GetBranch(string branchName)
+		{
+			var branch = await _client.Repository.Branch.Get(_options.Value.Owner, _options.Value.Name, branchName);
+
+			if (branch == null)
+				return null;
+
+			var repo = await _client.Repository.Get(_options.Value.Owner, _options.Value.Name);
+
+			var defaultBranch = repo.DefaultBranch;
+
+			return new GithubBranch
+			{
+				Name = branch.Name,
+				Sha = branch.Commit.Sha,
+				IsDefault = branch.Name == defaultBranch
+			};
 		}
 
 		public string PublicUrl => $"https://github.com/{_options.Value.Owner}/{_options.Value.Name}";

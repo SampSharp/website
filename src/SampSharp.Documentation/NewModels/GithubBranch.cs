@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace SampSharp.Documentation.Models
+namespace SampSharp.Documentation.NewModels
 {
 	public class GithubBranch
 	{

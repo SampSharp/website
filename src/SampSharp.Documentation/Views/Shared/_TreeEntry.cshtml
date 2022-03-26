@@ -1,0 +1,23 @@
+﻿@using Microsoft.AspNetCore.Mvc.Routing
+@model SampSharp.Documentation.Services.TreeEntry
+
+@if (Model.Entries != null)
+{
+    <li class="tree-item is-expanded">
+        <span class="tree-expander">@Model.Link.Name</span>
+        <ul class="tree-group">
+            @foreach (var entry in Model.Entries)
+            {
+                @await Html.PartialAsync("_TreeEntry", entry)
+            }
+        </ul>
+    </li>
+
+}
+else
+{
+<li>
+
+    <a href="@Model.Link.ToUrl(Url)">@Model.Link.Name</a>
+</li>
+}

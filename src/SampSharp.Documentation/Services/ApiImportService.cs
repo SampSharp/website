@@ -6,11 +6,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Xml;
 using DocPluck.Parser;
-using Microsoft.AspNetCore.Mvc.ViewEngines;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Bson;
 using SampSharp.Documentation.Models;
-using Formatting = Newtonsoft.Json.Formatting;
 
 namespace SampSharp.Documentation.Services
 {

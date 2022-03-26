@@ -15,6 +15,7 @@
 
 using System;
 using System.Collections.Generic;
+using SampSharp.Documentation.Services;
 
 namespace SampSharp.Documentation.Models
 {
@@ -27,5 +28,6 @@ namespace SampSharp.Documentation.Models
 		public string EditUrl { get; set; }
 		public string Introduction { get; set; }
 		public List<ArticleQuickLink> QuickLinks { get; set; }
+		public LinkInfo[] Breadcrumbs { get; set; }
 	}
 }

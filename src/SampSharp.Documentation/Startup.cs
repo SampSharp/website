@@ -17,10 +17,14 @@ using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
+using Pomelo.EntityFrameworkCore.MySql.Storage;
 using SampSharp.Documentation.Configuration;
+using SampSharp.Documentation.NewModels;
 using SampSharp.Documentation.Repositories;
 using SampSharp.Documentation.Services;
 
@@ -50,25 +54,33 @@ namespace SampSharp.Documentation
 			}
 #endif
 
+			// TODO: Move connection string to config
+			services.AddDbContextPool<DocsDbContext>(options => options
+				.UseMySql("foobar", mySqlOptions => mySqlOptions
+					.ServerVersion(new ServerVersion(new Version(10, 4, 8), ServerType.MariaDb))
+				));
+
 			services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
 
 			services.Configure<RepositoryOptions>(Configuration.GetSection("Repository"));
 			services.Configure<StorageOptions>(Configuration.GetSection("Storage"));
 			services.Configure<ImportOptions>(Configuration.GetSection("Import"));
 
-			services.AddTransient<IDocsImportService, DocsImportService>();
 			services.AddTransient<IDocsVersionBuilder, DocsVersionBuilder>();
-			services.AddTransient<ApiImportService>();
 			services.AddTransient<IDocumentationDataRepository, DocumentationDataRepository>();
 			services.AddTransient<IViewRenderService, ViewRenderService>();
 			services.AddTransient<IGithubDataRepository, GithubDataRepository>();
+			
+			//services.AddTransient<IDocsImportService, DocsImportService>();
+			services.AddTransient<ApiImportService>();
+			services.AddTransient<NewDocsImportService>();
 
 			services.AddTransient<IStorageService, StorageService>();
 			services.AddTransient<IFileSystemService, FileSystemService>();
 		}
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-		public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ApiImportService apiImportService, IDocsImportService docsImportService, IDocumentationDataRepository documentationDataRepository)
+		public void Configure(IApplicationBuilder app, IWebHostEnvironment env, NewDocsImportService docsImportService)
 		{
 			try
 			{
@@ -108,16 +120,6 @@ namespace SampSharp.Documentation
 			app.UseRouting();
 			app.UseEndpoints(endpoints =>
 			{
-				// catch-all must come early because ASP.net is broken
-//				endpoints.MapControllerRoute(
-//					"documentation",
-//					"{versionOrPage?}/{*page}",
-//					new
-//					{
-//						controller = "Documentation",
-//						action = "Index"
-//					});
-				
 				endpoints.MapControllerRoute("home2", "/index2", new
 				{
 					controller = "Home",
@@ -167,8 +169,8 @@ namespace SampSharp.Documentation
 					});
 				
 				endpoints.MapControllerRoute(
-					"documentation",
-					"docs/{versionOrPage?}/{*page}",
+					"docs",
+					"docs/{version?}/{*page}",
 					new
 					{
 						controller = "Documentation",

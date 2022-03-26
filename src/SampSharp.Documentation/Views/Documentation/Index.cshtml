@@ -4,6 +4,26 @@
     ViewData["Title"] = Model.Title;
 }
 
+@section Breadcrumbs
+{
+    <li>
+        <a href="/">SampSharp</a>
+    </li>
+    <li>
+        <a href="/docs">Docs</a>
+    </li>
+    <li>
+        <a href=".">@Model.Title</a>
+    </li>
+}
+
+@section ContentMenu
+{
+    @foreach (var e in Model.Menu)
+    {
+        @await Html.PartialAsync("_TreeEntry", e)
+    }
+}
 @section ToolButtons
 {
     <a class="breadcrumbs-button not-mobile" href="@Model.EditUrl">
