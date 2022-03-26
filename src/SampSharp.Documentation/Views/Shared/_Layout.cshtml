@@ -1,11 +1,12 @@
-﻿<!DOCTYPE html>
+﻿@using SampSharp.Documentation.Models
+<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" href="/favicon.ico">
     <title>@Html.Raw(string.IsNullOrWhiteSpace(ViewData["Title"] as string) ? "SampSharp" : $"{ViewData["Title"]} - SampSharp")</title>
-    <link rel="stylesheet" href="/css/site.min.css"/>
+    <link rel="stylesheet" href="/dist/css/main.css"/>
 </head>
 <body>
 <header>
@@ -52,7 +53,7 @@
                 <h2>General</h2>
             </a>
             <p>
-                <a href="http://api.sampsharp.timpotze.nl">API</a>
+                <a href="https://api.sampsharp.net">API</a>
                 <br/>
                 <a href="https://github.com/ikkentim/sampsharp">GitHub</a>
                 <br/>
@@ -108,7 +109,7 @@
         </div>
     </div>
 </footer>
-<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.13.1/highlight.min.js"></script>
-<script src="/script.js"></script>
+@* <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.13.1/highlight.min.js"></script> *@
+<script src="/dist/js/site.js"></script>
 </body>
 </html>

@@ -1,32 +1,95 @@
-﻿// SampSharp.Documentation
-// Copyright 2019 Tim Potze
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-// 
-//     http://www.apache.org/licenses/LICENSE-2.0
-// 
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+using Microsoft.Extensions.DependencyInjection;
+using SampSharp.Documentation;
+using SampSharp.Documentation.Configuration;
+using SampSharp.Documentation.Repositories;
 
-using Microsoft.AspNetCore;
-using Microsoft.AspNetCore.Hosting;
+var builder = WebApplication.CreateBuilder(args);
 
-namespace SampSharp.Documentation
+// Add services to the container.
+builder.Services.AddControllersWithViews();
+
+builder.Services.Configure<RepositoryOptions>(builder.Configuration.GetSection("Repository"));
+builder.Services.Configure<StorageOptions>(builder.Configuration.GetSection("Storage"));
+builder.Services.Configure<ImportOptions>(builder.Configuration.GetSection("Import"));
+
+builder.Services.AddTransient<IDataImportService, DataImportService>();
+builder.Services.AddSingleton<IVersionBuilder, VersionBuilder>();
+builder.Services.AddSingleton<DataImportService>();
+builder.Services.AddSingleton<IDataRepository, DataRepository>();
+builder.Services.AddTransient<IGithubDataRepository, GithubDataRepository>();
+
+var app = builder.Build();
+
+if (app.Services.GetRequiredService<IDataRepository>().IsEmpty)
+    app.Services.GetRequiredService<IDataImportService>().ImportAllBranches();
+
+// Configure the HTTP request pipeline.
+if (!app.Environment.IsDevelopment())
 {
-	public class Program
-	{
-		public static void Main(string[] args)
-		{
-			CreateWebHostBuilder(args).Build().Run();
-		}
-
-		public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
-			WebHost.CreateDefaultBuilder(args)
-				.UseStartup<Startup>();
-	}
+    app.UseExceptionHandler("/__internal/error/server_error");
+    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+    app.UseHsts();
 }
+
+app.UseHttpsRedirection();
+app.UseStaticFiles();
+
+app.UseRouting();
+
+app.UseAuthorization();
+
+app.MapControllerRoute(
+    name: "home",
+    pattern: "/",
+    new
+    {
+        controller = "Home",
+        action = "Index"
+    });
+
+app.MapControllerRoute(
+    name: "server_error",
+    pattern: "/__internal/error/server_error",
+    new
+    {
+        controller = "Error",
+        action = "ServerError"
+    });
+
+app.MapControllerRoute(
+    name: "not_found",
+    pattern: "/__internal/error/not_found",
+    new
+    {
+        controller = "Error",
+        action = "PageNotFound"
+    });
+
+app.MapControllerRoute(
+    name: "webhook_manual_all_branches",
+    pattern: "/webhook/all",
+    new
+    {
+        controller = "WebHook",
+        action = "ImportAllBranches"
+    });
+
+app.MapControllerRoute(
+    name: "webhook_github",
+    pattern: "/webhook/github",
+    new
+    {
+        controller = "WebHook",
+        action = "GitHub"
+    });
+
+app.MapControllerRoute(
+    name: "documentation",
+    pattern: "{versionOrPage?}/{*page}",
+    new
+    {
+        controller = "Documentation",
+        action = "Index"
+    });
+
+app.Run();

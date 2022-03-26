@@ -1,4 +1,5 @@
-﻿
+var hljs = require("highlightjs");
+
 hljs.initHighlightingOnLoad();
 
 document.querySelectorAll('.dropdown')

@@ -13,8 +13,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Octokit;
 using SampSharp.Documentation.Configuration;

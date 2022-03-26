@@ -341,5 +341,4 @@ ASALocalRun/
 healthchecksdb
 
 src/SampSharp.Documentation/data/
-src/SampSharp.Documentation/wwwroot/css
-src/SampSharp.Documentation/wwwroot/js
+src/SampSharp.Documentation/wwwroot/dist

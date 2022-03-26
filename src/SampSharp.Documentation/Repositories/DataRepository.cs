@@ -13,10 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.IO;
+using System.Diagnostics;
 using Microsoft.AspNetCore.StaticFiles;
-using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using SampSharp.Documentation.Configuration;
@@ -53,6 +51,8 @@ namespace SampSharp.Documentation.Repositories
 		private Stream Read(string path)
 		{
 			if (path == null) throw new ArgumentNullException(nameof(path));
+
+            Debug.WriteLine($"start read {path}");
 
 			path = AbsolutePath(path) ?? throw new ArgumentException("Invalid path", nameof(path));
 
@@ -109,26 +109,48 @@ namespace SampSharp.Documentation.Repositories
 
 			return File.Exists(htmlPath) && File.Exists(metaPath);
 		}
-
+		
+        private object _configLock = new object();
+        private DocConfiguration _config;
 		public DocConfiguration GetDocConfiguration()
 		{
-			var serializer = new JsonSerializer();
+            if (_config != null)
+            {
+                return _config;
+            }
 
-			using (var fileStream = Read("config.json"))
-			using (var streamReader = new StreamReader(fileStream))
-			using (var jsonTextReader = new JsonTextReader(streamReader))
-			{
-				return serializer.Deserialize<DocConfiguration>(jsonTextReader);
-			}
-		}
+            lock (_configLock)
+            {
+                if (_config != null)
+                {
+                    return _config;
+                }
+
+                var serializer = new JsonSerializer();
+
+                using (var fileStream = Read("config.json"))
+                using (var streamReader = new StreamReader(fileStream))
+                using (var jsonTextReader = new JsonTextReader(streamReader))
+                {
+					var config = serializer.Deserialize<DocConfiguration>(jsonTextReader);
+                    _config = config;
+                    return config;
+                }
+            }
+        }
 
 		public void StoreDocConfiguration(DocConfiguration config)
 		{
 			if (config == null) throw new ArgumentNullException(nameof(config));
-			var json = JsonConvert.SerializeObject(config);
 
-			File.WriteAllText(AbsolutePath("config.json"), json);
-		}
+            lock (_configLock)
+            {
+                var json = JsonConvert.SerializeObject(config);
+
+                File.WriteAllText(AbsolutePath("config.json"), json);
+                _config = config;
+            }
+        }
 
 		public DocFile GetDocFile(string branch, string path)
 		{
