@@ -1,4 +1,4 @@
-using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.Options;
 using SampSharp.Documentation;
 using SampSharp.Documentation.Configuration;
@@ -35,6 +35,21 @@ if (!app.Environment.IsDevelopment())
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
+
+app.Use(async (ctx, next) =>
+{
+    await next();
+
+    if(ctx.Response.StatusCode == 404 && !ctx.Response.HasStarted)
+    {
+        //Re-execute the request so the user gets the error page
+        ctx.SetEndpoint(endpoint: null);
+        var routeValuesFeature = ctx.Features.Get<IRouteValuesFeature>();
+        routeValuesFeature?.RouteValues?.Clear();
+        ctx.Request.Path = "/__internal/error/not_found";
+        await next();
+    }
+});
 
 app.UseStaticFiles();
 

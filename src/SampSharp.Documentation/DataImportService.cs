@@ -181,11 +181,18 @@ namespace SampSharp.Documentation
 					defaultVersion = version;
 				
 				var archive = await _githubDataRepository.GetArchive(branch);
-
+				
                 await using var memoryStream = new MemoryStream(archive);
                 await using var gzipStream = new GZipStream(memoryStream, CompressionMode.Decompress);
-                using var tarReader = new TarReader(gzipStream);
-				
+
+				// TODO: something is broken here...
+                await using var bufferStream = new MemoryStream();
+                await gzipStream.CopyToAsync(bufferStream);
+                bufferStream.Position = 0;
+
+                using var tarReader = new TarReader(bufferStream);
+
+
                 string rootDirectory = null;
                 while (tarReader.Next() is var entry && entry != null)
                 {
