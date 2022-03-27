@@ -169,88 +169,97 @@ namespace SampSharp.Documentation
 			{
 				_dataRepository.DeleteBranch(branch.Name);
 
-				var version = new DocVersion(BranchNameToPathString(branch.Name), branch.Name);
+                if (_options.Value.IgnoredBranches?.Contains(branch.Name) ?? false)
+                {
+                    continue;
+                }
 
-				versions.Add(version);
+				var version = new DocVersion(BranchNameToPathString(branch.Name), branch.Name);
+                versions.Add(version);
+
 				if (branch.IsDefault)
 					defaultVersion = version;
-
+				
 				var archive = await _githubDataRepository.GetArchive(branch);
 
-				using (var memoryStream = new MemoryStream(archive))
-				using (var gzipStream = new GZipStream(memoryStream, CompressionMode.Decompress))
-				using (var tarReader = new TarReader(gzipStream))
-				{
-					string rootDirectory = null;
-					while (tarReader.Next() is var entry && entry != null)
-					{
-						if (entry.Header.Flag == TarHeaderFlag.Directory && rootDirectory == null) rootDirectory = entry.Header.Name;
-						if (entry.Header.Flag == TarHeaderFlag.NormalFile)
-						{
-							if (Path.GetExtension(entry.Header.Name) == ".md")
-							{
-								using (var streamReader = new StreamReader(entry))
-								{
-									var markdown = streamReader.ReadToEnd();
+                await using var memoryStream = new MemoryStream(archive);
+                await using var gzipStream = new GZipStream(memoryStream, CompressionMode.Decompress);
+                using var tarReader = new TarReader(gzipStream);
+				
+                string rootDirectory = null;
+                while (tarReader.Next() is var entry && entry != null)
+                {
+                    switch (entry.Header.Flag)
+                    {
+                        case TarHeaderFlag.Directory when rootDirectory == null:
+                            rootDirectory = entry.Header.Name;
+                            break;
+                        case TarHeaderFlag.NormalFile when Path.GetExtension(entry.Header.Name) == ".md":
+                        case TarHeaderFlag.NormalFileAlt when Path.GetExtension(entry.Header.Name) == ".md":
+                        {
+                            using var streamReader = new StreamReader(entry);
+                            var markdown = await streamReader.ReadToEndAsync();
 
-									var meta = ParseMeta(ref markdown);
+                            var meta = ParseMeta(ref markdown);
 
-									// Parse markdown
-									var document = Markdig.Markdown.Parse(markdown,
-										new MarkdownPipelineBuilder()
-											.UseAdvancedExtensions()
-											.UsePipeTables()
-											.Build());
+                            // Parse markdown
+                            var document = Markdig.Markdown.Parse(markdown,
+                                new MarkdownPipelineBuilder()
+                                    .UseAdvancedExtensions()
+                                    .UsePipeTables()
+                                    .Build());
 
-									var sw = new StringWriter();
-									var renderer = new CustomHtmlRenderer(sw);
-									renderer.Render(document);
-									sw.Flush();
-									var html = sw.ToString();
+                            var sw = new StringWriter();
+                            var renderer = new CustomHtmlRenderer(sw);
+                            renderer.Render(document);
+                            await sw.FlushAsync();
+                            var html = sw.ToString();
 
-									var file = new DocFile
-									{
-										Content = html,
-										Meta = meta
-									};
+                            var file = new DocFile
+                            {
+                                Content = html,
+                                Meta = meta
+                            };
 
-									var docPath = entry.Header.Name;
+                            var docPath = entry.Header.Name;
 
-									if (rootDirectory != null && docPath.StartsWith(rootDirectory))
-										docPath = docPath.Substring(rootDirectory.Length).TrimStart('/', '\\');
+                            if (rootDirectory != null && docPath.StartsWith(rootDirectory))
+                                docPath = docPath.Substring(rootDirectory.Length).TrimStart('/', '\\');
 
-									var fileName = Path.GetFileNameWithoutExtension(docPath);
-									docPath = Path.Combine(Path.GetDirectoryName(docPath), fileName);
+                            var fileName = Path.GetFileNameWithoutExtension(docPath)!;
+                            docPath = Path.Combine(Path.GetDirectoryName(docPath)!, fileName);
 
-									if (fileName == "index") version.DefaultPage = meta.RedirectPage;
+                            if (fileName == "index") version.DefaultPage = meta.RedirectPage;
 
-									meta.LastModification = entry.Header.LastModification ?? DateTime.UtcNow;
-									meta.EditUrl = $"{_githubDataRepository.PublicUrl}/blob/{branch.Name}/{docPath}.md";
-									meta.Title = meta.Title ?? fileName.Replace('-', ' ');
+                            meta.LastModification = entry.Header.LastModification ?? DateTime.UtcNow;
+                            meta.EditUrl = $"{_githubDataRepository.PublicUrl}/blob/{branch.Name}/{docPath}.md";
+                            meta.Title ??= fileName.Replace('-', ' ');
 
-									_dataRepository.StoreDocFile(branch.Name, docPath, file);
-								}
-							}
-							else
-							{
-								var assetPath = entry.Header.Name;
+                            _dataRepository.StoreDocFile(branch.Name, docPath, file);
 
-								if (rootDirectory != null && assetPath.StartsWith(rootDirectory))
-									assetPath = assetPath.Substring(rootDirectory.Length).TrimStart('/', '\\');
+                            break;
+                        }
+                        case TarHeaderFlag.NormalFile:
+                        case TarHeaderFlag.NormalFileAlt:
+                        {
+                            var assetPath = entry.Header.Name!;
 
-								assetPath = assetPath.ToLower();
+                            if (rootDirectory != null && assetPath.StartsWith(rootDirectory))
+                                assetPath = assetPath.Substring(rootDirectory.Length).TrimStart('/', '\\');
 
-								// Skip unaccepted asset types
-								if (_options.Value.AcceptedAssets.Contains(Path.GetExtension(assetPath)))
-								{
-									_dataRepository.StoreAsset(branch.Name, assetPath, entry);
-								}
+                            assetPath = assetPath.ToLower();
 
-							}
-						}
-					}
-				}
-			}
+                            // Skip unaccepted asset types
+                            if (_options.Value.AcceptedAssets.Contains(Path.GetExtension(assetPath)))
+                            {
+                                _dataRepository.StoreAsset(branch.Name, assetPath, entry);
+                            }
+
+                            break;
+                        }
+                    }
+                }
+            }
 
 			var docConfig = new DocConfiguration
 			{

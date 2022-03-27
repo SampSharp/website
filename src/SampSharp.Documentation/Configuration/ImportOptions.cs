@@ -18,5 +18,6 @@ namespace SampSharp.Documentation.Configuration
 	public class ImportOptions
 	{
 		public string[] AcceptedAssets { get; set; }
+		public string[] IgnoredBranches { get; set; }
 	}
 }

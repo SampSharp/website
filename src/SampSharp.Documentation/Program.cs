@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using SampSharp.Documentation;
 using SampSharp.Documentation.Configuration;
 using SampSharp.Documentation.Repositories;
@@ -21,7 +22,11 @@ builder.Services.AddTransient<IGithubDataRepository, GithubDataRepository>();
 var app = builder.Build();
 
 if (app.Services.GetRequiredService<IDataRepository>().IsEmpty)
+{
+    var options = app.Services.GetRequiredService<IOptions<RepositoryOptions>>();
+    app.Logger.LogInformation($"Collecting initial docs from {options.Value.Owner}/{options.Value.Name} (secret: {options.Value.Secret})");
     app.Services.GetRequiredService<IDataImportService>().ImportAllBranches();
+}
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -31,7 +36,6 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
