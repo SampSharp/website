@@ -8,7 +8,7 @@ on:
 
 env:
   REGISTRY: registry.ikt.im
-  IMAGE_NAME: ${{ github.event.repository.name }}
+  IMAGE_NAME: sampsharp.net
 
 jobs:
   build:
