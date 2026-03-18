@@ -1,2 +1,4 @@
 # website
-The official SampSharp website
+
+> [!IMPORTANT]
+> Documentation website was moved to https://github.com/SampSharp/docs
